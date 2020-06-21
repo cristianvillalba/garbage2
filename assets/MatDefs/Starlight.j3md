@@ -1,0 +1,25 @@
+MaterialDef Starlight {
+
+    MaterialParameters {
+        Texture2D Texture
+        Vector3 posOffset
+        Float distance
+    }
+
+
+    Technique {
+        VertexShader GLSL100:   Shaders/Star.vert
+        FragmentShader GLSL100: Shaders/Star.frag
+
+        WorldParameters {
+            WorldViewProjectionMatrix
+            Resolution
+            Time
+        }
+
+        RenderState {
+            Blend Alpha
+        }
+    }
+
+}
