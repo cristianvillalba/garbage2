@@ -30,7 +30,6 @@ public class PhysicControl implements PhysicsTickListener{
     
     @Override
     public void prePhysicsTick(PhysicsSpace space, float tpf) {
-
         if (!maincreature.isStartticking())
         {
             if (!maincreature.IsMoving())

@@ -352,6 +352,7 @@ public class MJNode extends Node implements Savable{
         Vector3f position = mirrored.GetOriginalTranslation().clone();
        
         this.setLocalTranslation(position);
+        
         originaltranslation.set(position);
         
         joints.add(0);
@@ -617,6 +618,22 @@ public class MJNode extends Node implements Savable{
              
                     if (usedjoints.get(index) != this.parent){
                         usedjoints.get(index).SavePreviousPos();
+                    }  
+            }
+        
+        
+    }
+    
+    public void PrintPosition()
+    {
+        MJEnvironmentMain.log.info("pos: " + this.getWorldTranslation());
+
+            for (int i = 0; i < usedjoints.keySet().toArray().length; i++)
+            {
+                Integer index = (Integer) usedjoints.keySet().toArray()[i];
+             
+                    if (usedjoints.get(index) != this.parent){
+                        usedjoints.get(index).PrintPosition();
                     }  
             }
         

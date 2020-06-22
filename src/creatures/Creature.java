@@ -143,6 +143,13 @@ public class Creature implements Comparable, Savable{
         }
     }
     
+    public void PrintPostion()
+    {
+        if (rootnode != null){
+            rootnode.PrintPosition(); 
+        }
+    }
+    
      public void RemoveAllBodies()
     {
         if (rootnode != null){
@@ -459,7 +466,7 @@ public class Creature implements Comparable, Savable{
         else
         {
             rootnode = new MJNode(father.GetRootNode(),null, mat, symetricdata,  bulletappstate, mutate, parent);
-        
+            
             rootnode.ConnectJointsRecursive(null);    
             CopyBrain(symetricdata, mutate, father);
             

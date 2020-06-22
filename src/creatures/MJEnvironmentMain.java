@@ -41,11 +41,16 @@ import com.jme3.system.AppSettings;
 import com.jme3.texture.Texture;
 import com.jme3.texture.Texture.WrapMode;
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 import jme3utilities.minie.FilterAll;
 
 /**
@@ -142,6 +147,9 @@ public class MJEnvironmentMain extends SimpleApplication implements AnalogListen
     private int alivecounter = 0;
       
     final int SHADOWMAP_SIZE=1024;
+    
+    
+    public static Logger log;
       
     static {
         box = new Box(brickLength, brickHeight, brickWidth);
@@ -163,7 +171,27 @@ public class MJEnvironmentMain extends SimpleApplication implements AnalogListen
         wall04.scaleTextureCoordinates(new Vector2f(3, 6));
   }
     
-    public static void main(String args[]) {
+    public static void main(String args[]) throws IOException {
+        
+        log = Logger.getLogger("BulletLog");  
+        FileHandler fh;
+        try {
+            // This block configure the logger with handler and formatter  
+            fh = new FileHandler("bulletlog.log");  
+            log.addHandler(fh);
+            CustomLogFormatter formatter = new CustomLogFormatter();  
+            fh.setFormatter(formatter);  
+
+            // the following statement is used to log any messages  
+            //logger.info("My first log");  
+
+        } catch (SecurityException e) {  
+            e.printStackTrace();  
+        } catch (IOException e) {  
+            e.printStackTrace();  
+        }  
+        
+        
         MJEnvironmentMain app = new MJEnvironmentMain();
         app.setPauseOnLostFocus(false);
         AppSettings newSettings = new AppSettings(true);
@@ -459,6 +487,7 @@ public class MJEnvironmentMain extends SimpleApplication implements AnalogListen
         {
             for (int i = 0; i < populationobserved.size(); i++)
             {
+                populationobserved.get(i).PrintPostion();
                 populationobserved.get(i).GetRootNode().GetBodyControl().activate();
             }
             moveTarget();
@@ -467,14 +496,16 @@ public class MJEnvironmentMain extends SimpleApplication implements AnalogListen
     
     public boolean canAllMove()
     {
-        if (alivecounter ==  populationobserved.size())
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return false;
+        
+//        if (alivecounter ==  populationobserved.size())
+//        {
+//            return true;
+//        }
+//        else
+//        {
+//            return false;
+//        }
     }
     
     private void LoadLight()
@@ -873,6 +904,8 @@ public class MJEnvironmentMain extends SimpleApplication implements AnalogListen
             cancheck = true;
             checkactualtimer = 0f;
             fixedtime = 0f;
+            
+            MJEnvironmentMain.log.log(Level.INFO,"Init Evolution");
         }
     }
     
@@ -998,13 +1031,14 @@ public class MJEnvironmentMain extends SimpleApplication implements AnalogListen
         populationselection.clear();
         
         populationselection = loadedstate.getPopulationselection();
-         
+        
         randpositions.clear();
         
         randpositions = loadedstate.getRandpositions();
         
         generation = loadedstate.getGeneration();
         
+        log.info("LOADING A NEW CREATURE----------------------------------");
         ReevaluateSelection();
         
         state = 1;
@@ -1195,7 +1229,9 @@ public class MJEnvironmentMain extends SimpleApplication implements AnalogListen
                                     creat.NewBornChild(bluemat, stone_mat, rootNode, newstate, this);
                                 }
                                 //}
-                                
+                                log.info("Loaded POS");
+                                creat.PrintPostion();
+                                log.info("------Loaded POS");
                                 //moveTarget();
                                 populationobserved.add(creat);
                             }

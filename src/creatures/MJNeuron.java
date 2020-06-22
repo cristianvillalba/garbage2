@@ -586,6 +586,7 @@ public class MJNeuron implements Savable {
                                             motor = part.GetJoint().getRotationMotor(PhysicsSpace.AXIS_Z);
                                             motor.set(MotorParam.TargetVelocity, totalWeight*5);
                                             
+                                            //MJEnvironmentMain.log.info("Axis 0 " + totalWeight + " tpf:" + tpf + " " + part.getWorldTranslation());
                                             break;
                                         }
                                         case 1:
@@ -593,6 +594,7 @@ public class MJNeuron implements Savable {
                                             motor = part.GetJoint().getRotationMotor(PhysicsSpace.AXIS_Z);
                                             motor.set(MotorParam.TargetVelocity, totalWeight*-5);
                                             
+                                            //MJEnvironmentMain.log.info("Axis 1 " + totalWeight + " tpf:" + tpf + " " + part.getWorldTranslation());
                                             break;
                                         }
                                         case 2:
@@ -600,6 +602,7 @@ public class MJNeuron implements Savable {
                                             motor = part.GetJoint().getRotationMotor(PhysicsSpace.AXIS_Y);
                                             motor.set(MotorParam.TargetVelocity, totalWeight*5);
                                             
+                                            //MJEnvironmentMain.log.info("Axis 2 " + totalWeight + " tpf:" + tpf + " " + part.getWorldTranslation());
                                             break;
                                         }
                                         case 3:
@@ -607,6 +610,7 @@ public class MJNeuron implements Savable {
                                             motor = part.GetJoint().getRotationMotor(PhysicsSpace.AXIS_Y);
                                             motor.set(MotorParam.TargetVelocity, totalWeight*-5);
                                             
+                                            //MJEnvironmentMain.log.info("Axis 3 " + totalWeight + " tpf:" + tpf + " " + part.getWorldTranslation());
                                             break;
                                         }
                                         case 4:
@@ -614,6 +618,7 @@ public class MJNeuron implements Savable {
                                             motor = part.GetJoint().getRotationMotor(PhysicsSpace.AXIS_X);
                                             motor.set(MotorParam.TargetVelocity, totalWeight*5);
                                             
+                                            //MJEnvironmentMain.log.info("Axis 4 " + totalWeight + " tpf:" + tpf + " " + part.getWorldTranslation());
                                             break;
                                         }
                                         case 5:
@@ -621,6 +626,7 @@ public class MJNeuron implements Savable {
                                             motor = part.GetJoint().getRotationMotor(PhysicsSpace.AXIS_X);
                                             motor.set(MotorParam.TargetVelocity, totalWeight*-5);
                                             
+                                            //MJEnvironmentMain.log.info("Axis 5 " + totalWeight + " tpf:" + tpf + " " + part.getWorldTranslation());
                                             break;
                                         }
                                     }
