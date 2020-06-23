@@ -10,6 +10,7 @@ import com.jme3.asset.TextureKey;
 import com.jme3.asset.plugins.FileLocator;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.bullet.MultiBodyAppState;
+import com.jme3.bullet.PhysicsSpace;
 import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.bullet.debug.BulletDebugAppState;
 import com.jme3.export.binary.BinaryExporter;
@@ -86,6 +87,7 @@ public class MJEnvironmentMain extends SimpleApplication implements AnalogListen
     
     public static final boolean FIXEDSTEP = false;
     public static final float FIXEDSTEPSIZE = 0.003f;
+    public static int totalsteps = 0;
     
     private Vector3f upforce = new Vector3f(0, 400, 0);
     
@@ -119,7 +121,7 @@ public class MJEnvironmentMain extends SimpleApplication implements AnalogListen
     
     //private float maxpopulation = 200;
     //private float maxsurvivals = maxpopulation*0.2f;
-    private float maxpopulation = 3;
+    private float maxpopulation = 5;
     private float maxsurvivals = 1;
     private int maxparallelchecks = 5;
     private int creaturestospawn;
@@ -461,20 +463,9 @@ public class MJEnvironmentMain extends SimpleApplication implements AnalogListen
     }
     
     //private BulletAppState LoadPhysics()
-    private MultiBodyAppState LoadPhysics()
+    private PhysicsSpace LoadPhysics()
     {
-        MultiBodyAppState bulletAppState = new MultiBodyAppState();
-        bulletAppState.setThreadingType(BulletAppState.ThreadingType.PARALLEL);
-        //bulletAppState.setThreadingType(BulletAppState.ThreadingType.SEQUENTIAL);
-        bulletAppState.setDebugEnabled(true);
-        BulletDebugAppState.DebugAppStateFilter selectAll = new FilterAll(true);
-        bulletAppState.setDebugVelocityVectorFilter(selectAll);
-        
-        
-        stateManager.attach(bulletAppState);
-        bulletAppState.getPhysicsSpace().setAccuracy(1f/120f);
-        //bulletAppState.getPhysicsSpace().setMaxSubSteps(1);
-        
+        PhysicsSpace bulletAppState = new PhysicsSpace(PhysicsSpace.BroadphaseType.SIMPLE);
             
         return bulletAppState;
     }
@@ -487,7 +478,6 @@ public class MJEnvironmentMain extends SimpleApplication implements AnalogListen
         {
             for (int i = 0; i < populationobserved.size(); i++)
             {
-                populationobserved.get(i).PrintPostion();
                 populationobserved.get(i).GetRootNode().GetBodyControl().activate();
             }
             moveTarget();
@@ -496,16 +486,16 @@ public class MJEnvironmentMain extends SimpleApplication implements AnalogListen
     
     public boolean canAllMove()
     {
-        return false;
+        //return false;
         
-//        if (alivecounter ==  populationobserved.size())
-//        {
-//            return true;
-//        }
-//        else
-//        {
-//            return false;
-//        }
+        if (alivecounter ==  populationobserved.size())
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
     
     private void LoadLight()
@@ -536,7 +526,7 @@ public class MJEnvironmentMain extends SimpleApplication implements AnalogListen
         rootNode.addLight(al);
     }
     
-    public void initFloor(BulletAppState state) {
+    public void initFloor(PhysicsSpace state) {
         
         if (floor_phy == null){
             Geometry floor_geo = new Geometry("Floor", floor);
@@ -663,21 +653,13 @@ public class MJEnvironmentMain extends SimpleApplication implements AnalogListen
     
     private Creature SpawnCreature()
     {
-        MultiBodyAppState state = this.LoadPhysics();
+        PhysicsSpace state = this.LoadPhysics();
         
         this.initFloor(state);
         
         Creature creat = new Creature();
         creat.BuildRand(wall_mat,stone_mat, rootNode, state);
-        
-        if (!MJEnvironmentMain.FIXEDSTEP){
-            
-            PhysicControl control = new PhysicControl(this);
-            control.SetCreature(creat);
-
-            state.getPhysicsSpace().addTickListener(control);
-        }
-        
+           
         return creat;
     }
     
@@ -814,8 +796,8 @@ public class MJEnvironmentMain extends SimpleApplication implements AnalogListen
                 {
                     //------get copies of creatures------
                     //only mutate weights in NN
-                    //Creature newbornchild = new Creature(populationselection.get(i), true);            
-                    Creature newbornchild = new Creature(populationselection.get(i), false);            
+                    Creature newbornchild = new Creature(populationselection.get(i), true);            
+                    //Creature newbornchild = new Creature(populationselection.get(i), false);            
                     population.push(newbornchild);
                 }
                 
@@ -834,13 +816,13 @@ public class MJEnvironmentMain extends SimpleApplication implements AnalogListen
             if (populationselection.size() == 0)
             {
                 System.out.println("New creature------------------------");
-                //creat = new Creature(backupcreature, true);
-                creat = new Creature(backupcreature, false);
+                creat = new Creature(backupcreature, true);
+                //creat = new Creature(backupcreature, false);
             }
             else {
                 System.out.println("New creature from population selection (?)<------------------------");
-                //creat = new Creature(populationselection.get(0), true);
-                creat = new Creature(populationselection.get(0), false);
+                creat = new Creature(populationselection.get(0), true);
+                //creat = new Creature(populationselection.get(0), false);
             }
             
             population.push(creat);
@@ -904,6 +886,7 @@ public class MJEnvironmentMain extends SimpleApplication implements AnalogListen
             cancheck = true;
             checkactualtimer = 0f;
             fixedtime = 0f;
+            totalsteps = 0;
             
             MJEnvironmentMain.log.log(Level.INFO,"Init Evolution");
         }
@@ -951,7 +934,7 @@ public class MJEnvironmentMain extends SimpleApplication implements AnalogListen
         {
             population.get(i).DetachPhysics();
             population.get(i).KillAll();
-            stateManager.detach(population.get(i).GetPhysicState());
+            //stateManager.detach(population.get(i).GetPhysicState());
         }
         
         population.clear();
@@ -960,7 +943,7 @@ public class MJEnvironmentMain extends SimpleApplication implements AnalogListen
         {
             populationobserved.get(i).DetachPhysics();
             populationobserved.get(i).KillAll();
-            stateManager.detach(populationobserved.get(i).GetPhysicState());
+            //stateManager.detach(populationobserved.get(i).GetPhysicState());
         }
         
         populationobserved.clear();
@@ -969,7 +952,7 @@ public class MJEnvironmentMain extends SimpleApplication implements AnalogListen
         {
             populationselection.get(i).DetachPhysics();
             populationselection.get(i).KillAll();
-            stateManager.detach(populationselection.get(i).GetPhysicState());
+            //stateManager.detach(populationselection.get(i).GetPhysicState());
         }
         
         populationselection.clear();
@@ -1007,7 +990,7 @@ public class MJEnvironmentMain extends SimpleApplication implements AnalogListen
         {
             population.get(i).DetachPhysics();
             population.get(i).KillAll();
-            stateManager.detach(population.get(i).GetPhysicState());
+            //stateManager.detach(population.get(i).GetPhysicState());
         }
         
         population.clear();
@@ -1016,7 +999,7 @@ public class MJEnvironmentMain extends SimpleApplication implements AnalogListen
         {
             populationobserved.get(i).DetachPhysics();
             populationobserved.get(i).KillAll();
-            stateManager.detach(populationobserved.get(i).GetPhysicState());
+            //stateManager.detach(populationobserved.get(i).GetPhysicState());
         }
         
         populationobserved.clear();
@@ -1025,7 +1008,7 @@ public class MJEnvironmentMain extends SimpleApplication implements AnalogListen
         {
             populationselection.get(i).DetachPhysics();
             populationselection.get(i).KillAll();
-            stateManager.detach(populationselection.get(i).GetPhysicState());
+            //stateManager.detach(populationselection.get(i).GetPhysicState());
         }
         
         populationselection.clear();
@@ -1038,7 +1021,6 @@ public class MJEnvironmentMain extends SimpleApplication implements AnalogListen
         
         generation = loadedstate.getGeneration();
         
-        log.info("LOADING A NEW CREATURE----------------------------------");
         ReevaluateSelection();
         
         state = 1;
@@ -1138,7 +1120,7 @@ public class MJEnvironmentMain extends SimpleApplication implements AnalogListen
                 {
                     for (int i = 0 ; i< populationobserved.size(); i++)
                     {
-                        MultiBodyAppState bstate = populationobserved.get(i).DetachPhysics();
+                        PhysicsSpace bstate = populationobserved.get(i).DetachPhysics();
                         
                         switch(typeoffitness){//only follow a target is the objective
                             case 2:
@@ -1157,7 +1139,7 @@ public class MJEnvironmentMain extends SimpleApplication implements AnalogListen
                                 }
                                 
                                 populationobserved.get(i).RemoveAllBodies();
-                                stateManager.detach(bstate);
+                                //stateManager.detach(bstate);
                                 break;
                             }
                         }
@@ -1207,15 +1189,7 @@ public class MJEnvironmentMain extends SimpleApplication implements AnalogListen
                             else
                             {
                                 //BulletAppState newstate = this.LoadPhysics();
-                                MultiBodyAppState newstate = this.LoadPhysics();
-                                
-                                if (!MJEnvironmentMain.FIXEDSTEP){
-                                    
-                                    PhysicControl creaturephysics = new PhysicControl(this);
-                                    creaturephysics.SetCreature(creat);
-                                    newstate.getPhysicsSpace().addTickListener(creaturephysics);
-                                    
-                                }
+                                PhysicsSpace newstate = this.LoadPhysics();
 
                                 this.initFloor(newstate);
                                 
@@ -1229,10 +1203,6 @@ public class MJEnvironmentMain extends SimpleApplication implements AnalogListen
                                     creat.NewBornChild(bluemat, stone_mat, rootNode, newstate, this);
                                 }
                                 //}
-                                log.info("Loaded POS");
-                                creat.PrintPostion();
-                                log.info("------Loaded POS");
-                                //moveTarget();
                                 populationobserved.add(creat);
                             }
   
@@ -1268,12 +1238,11 @@ public class MJEnvironmentMain extends SimpleApplication implements AnalogListen
                                 System.out.println("New distanceeeeeeee!!!: " + dist);
                                 populationselection.add(populationobserved.get(i));
   
-                                        
                                 populationobserved.get(i).RemoveAllBodies();
                                 
                                 
-                                MultiBodyAppState bstate = populationobserved.get(i).DetachPhysics();
-                                stateManager.detach(bstate);
+                                PhysicsSpace bstate = populationobserved.get(i).DetachPhysics();
+                                //stateManager.detach(bstate);
                                 
                                 break;
                             }
@@ -1323,15 +1292,7 @@ public class MJEnvironmentMain extends SimpleApplication implements AnalogListen
                         Creature creat = population.pop();
 
                         try{
-                            MultiBodyAppState newstate = this.LoadPhysics();
-                            
-                            if (!MJEnvironmentMain.FIXEDSTEP){
-                                    
-                                PhysicControl creaturephysics = new PhysicControl(this);
-                                creaturephysics.SetCreature(creat);
-                                newstate.getPhysicsSpace().addTickListener(creaturephysics);
-                                
-                            }
+                            PhysicsSpace newstate = this.LoadPhysics();
 
                             this.initFloor(newstate);
                             creat.NewBornChild(wall_mat, stone_mat, rootNode, newstate, this);
@@ -1357,6 +1318,41 @@ public class MJEnvironmentMain extends SimpleApplication implements AnalogListen
             {
                 break;
             }
-        } 
+        }
+        
+        if (populationobserved.size() > 0)
+        {
+            if (this.canAllMove()){
+                totalsteps += 1;
+            }
+            
+            for (int i = 0; i < populationobserved.size(); i++)
+            {
+                populationobserved.get(i).GetPhysicState().update(1);
+                
+                /*if ((totalsteps % 100) == 25)
+                {
+                    log.info("-step :" + totalsteps);
+                    populationobserved.get(i).PrintPostion();
+                }*/
+                           
+                if (!populationobserved.get(i).isStartticking())
+                {
+                    if (!populationobserved.get(i).IsMoving())
+                    {
+                        populationobserved.get(i).setStartticking(true);
+                        System.out.print("Start Brain!");
+                        this.wakeCreature();
+                    }
+                }
+                else
+                {
+                    if (this.canAllMove()){
+                        populationobserved.get(i).Tick(tpf);
+                    }
+                }
+
+            }
+        }
     }
 }

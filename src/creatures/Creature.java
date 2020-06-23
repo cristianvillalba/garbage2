@@ -7,6 +7,7 @@ package creatures;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.bullet.MultiBodyAppState;
+import com.jme3.bullet.PhysicsSpace;
 import com.jme3.export.InputCapsule;
 import com.jme3.export.JmeExporter;
 import com.jme3.export.JmeImporter;
@@ -27,7 +28,7 @@ import java.util.HashMap;
  */
 public class Creature implements Comparable, Savable{
     private MJNode rootnode;
-    private MultiBodyAppState bulletappstate;
+    private PhysicsSpace bulletappstate;
     private float fitness = 0.0f;
     private Vector3f originalpos = new Vector3f();
     private Creature father;
@@ -114,7 +115,7 @@ public class Creature implements Comparable, Savable{
     }
     
     
-    public MultiBodyAppState DetachPhysics()
+    public PhysicsSpace DetachPhysics()
     {
         if (rootnode != null){
             rootnode.DetachPhysics();
@@ -163,7 +164,7 @@ public class Creature implements Comparable, Savable{
     public void SpawnOnEnv(Material mat, Material matsymetric, Node parent, AppStateManager stateM)
     {
         averagedistances.clear();
-        stateM.attach(bulletappstate);
+        //stateM.attach(bulletappstate);
         rootnode.SpawnOnEnv(mat, matsymetric, null);
         SetFitness(0.0f);
     }
@@ -444,13 +445,13 @@ public class Creature implements Comparable, Savable{
     }
     
     
-    public void NewBornChild(Material mat, Material matsymetric, Node parent, MultiBodyAppState bullet, MJEnvironmentMain main)
+    public void NewBornChild(Material mat, Material matsymetric, Node parent, PhysicsSpace bullet, MJEnvironmentMain main)
     {
         bulletappstate = bullet;
         HashMap<MJNeuron, MJNeuron> symetricbrain = new HashMap<MJNeuron, MJNeuron>();
         HashMap<MJNode, MJNode> symetricdata = new HashMap<MJNode, MJNode>();
         
-        bulletappstate.setEnabled(false);
+        //bulletappstate.setEnabled(false);
         
         if (father != null && mother != null)
         {
@@ -488,7 +489,7 @@ public class Creature implements Comparable, Savable{
             
         }
       
-        bulletappstate.setEnabled(true);
+        //bulletappstate.setEnabled(true);
         father = null;
         mother = null;
         
@@ -535,7 +536,7 @@ public class Creature implements Comparable, Savable{
     }
     
    
-    public void BuildRand(Material mat, Material matsymetric, Node parent, MultiBodyAppState bullet)
+    public void BuildRand(Material mat, Material matsymetric, Node parent, PhysicsSpace bullet)
     {
         ArrayList<MJNode> allpositions = new ArrayList<MJNode>();
                 
@@ -567,7 +568,7 @@ public class Creature implements Comparable, Savable{
         creatureid = -1;
     }
     
-    public BulletAppState GetPhysicState()
+    public PhysicsSpace GetPhysicState()
     {
         return bulletappstate;
     }

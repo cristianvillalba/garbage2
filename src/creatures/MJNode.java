@@ -61,7 +61,7 @@ public class MJNode extends Node implements Savable{
     private MJNode copyfrom;
  
     private int id;
-    private BulletAppState bulletstate;
+    private PhysicsSpace bulletstate;
     private Node rootparent;
     
     /** dimensions used for bricks and wall */
@@ -195,7 +195,7 @@ public class MJNode extends Node implements Savable{
         body_phy.setSleepingThresholds(linearlimit,anglimit);
     }
     
-    public MJNode(MJNode orgfather, MJNode orgmother, MJNode father, Material mats, HashMap<MJNode, MJNode> sbrain,int swaplimit, BulletAppState state, int swapped, Node root)
+    public MJNode(MJNode orgfather, MJNode orgmother, MJNode father, Material mats, HashMap<MJNode, MJNode> sbrain,int swaplimit, PhysicsSpace state, int swapped, Node root)
     {
         MJNode mirrored = null;
         Vector3f offset = new Vector3f();
@@ -313,7 +313,7 @@ public class MJNode extends Node implements Savable{
     }
     
     /*-----------copy complete brain----------*/
-    public MJNode(MJNode orgfather, MJNode father, Material mats, HashMap<MJNode, MJNode> sdata, BulletAppState state, boolean mutate, Node root)
+    public MJNode(MJNode orgfather, MJNode father, Material mats, HashMap<MJNode, MJNode> sdata, PhysicsSpace state, boolean mutate, Node root)
     {
         MJNode mirrored = orgfather;
             
@@ -415,7 +415,7 @@ public class MJNode extends Node implements Savable{
         return originaltranslation;
     }
     
-    public MJNode(Material mat, Node rootpt, MJNode parent, BulletAppState bulletAppState, boolean generate, int i, int joint)
+    public MJNode(Material mat, Node rootpt, MJNode parent, PhysicsSpace bulletAppState, boolean generate, int i, int joint)
     {        
         locallength = brickLength;
         localheight = brickHeight;
@@ -535,7 +535,7 @@ public class MJNode extends Node implements Savable{
         return usedjoints;
     }
     
-    public BulletAppState GetBulletAppState()
+    public PhysicsSpace GetBulletAppState()
     {
         return bulletstate;
     }
@@ -1146,7 +1146,7 @@ public class MJNode extends Node implements Savable{
             }
     }
     
-    public void SpawnOnSpace(Node parent, BulletAppState b)
+    public void SpawnOnSpace(Node parent, PhysicsSpace b)
     {
         bulletstate = b;
         bulletstate.getPhysicsSpace().add(body_phy);
@@ -1170,7 +1170,7 @@ public class MJNode extends Node implements Savable{
             }
     }
     
-    public void RandomizeChild(Material mat,  BulletAppState bulletAppState, Node rootparent, int recursivelimit, boolean first, ArrayList<MJNode> allpositions) {
+    public void RandomizeChild(Material mat,  PhysicsSpace bulletAppState, Node rootparent, int recursivelimit, boolean first, ArrayList<MJNode> allpositions) {
         
         //if (recursivelimit > 0 && joints.size() > 0){
         if (joints.size() > 0){
